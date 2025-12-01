@@ -3,11 +3,10 @@ export interface IArticle {
   title: string;
   content: string;
   status: ArticleStatus;
-
 }
 
 export enum ArticleStatus {
-  SUSCESS = 'SUSCESS',
+  SUSCESS = 'SUCCESS',
   PENDING = 'PENDING',
   CANCEL = 'CANCEL',
 }
