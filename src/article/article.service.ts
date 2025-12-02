@@ -1,42 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import { IArticle, ArticleStatus } from './interface/article.interface';
 import { CreateArticleDto } from './interface/dto/create-article.dto';
-import { randomUUID } from 'crypto';
 import { UpdateArticleDto } from './interface/dto/update-article.dto';
+import { Article } from './entities/article.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ArticleService {
   // resource
-  private articles: IArticle[] = [];
+  constructor(
+    @InjectRepository(Article)
+    private ArticleRepository: Repository<Article>,
+  ) {}
 
-  createArticle(CreateArticleDto: CreateArticleDto) {
-    const article: IArticle = {
-      id: randomUUID(),
-      ...CreateArticleDto,
-    };
-    this.articles.push(article);
-    return article;
+  async createArticle(createArticleDto: CreateArticleDto): Promise<Article> {
+    const newArticle = await this.ArticleRepository.save(createArticleDto);
+    return newArticle;
+  }
+  async findAllArticle(): Promise<Article[]> {
+    return await this.ArticleRepository.find();
   }
 
-  findAllArticle(): IArticle[] {
-    return this.articles;
+  async findOneByParams(id: string): Promise<Article | null> {
+    return await this.ArticleRepository.findOne({ where: { id } });
   }
 
-  findOneByParams(id: string): IArticle | undefined {
-    return this.articles.find((item) => item.id === id);
-  }
-
-  updateArticleByParams(
+  async updateArticleByParams(
     article: IArticle,
     updateArticleDto: UpdateArticleDto,
-  ): IArticle {
+  ): Promise<Article> {
     Object.assign(article, updateArticleDto);
-    return article;
+    return await this.ArticleRepository.save(article);
   }
 
-  deleteByParams(articleData: IArticle): void {
-    this.articles = this.articles.filter(
-      (filterData) => filterData.id !== articleData.id,
-    );
+  async deleteByParams(articleData: Article): Promise<void> {
+    await this.ArticleRepository.delete(articleData.id);
   }
 }

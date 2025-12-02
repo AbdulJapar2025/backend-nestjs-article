@@ -23,7 +23,7 @@ export class Article {
     enum: ArticleStatus,
     default: ArticleStatus.PENDING,
   })
-  status: string;
+  status: ArticleStatus;
 
   @CreateDateColumn()
   readonly createAt: Date;

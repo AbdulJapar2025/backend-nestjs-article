@@ -15,44 +15,45 @@ import { CreateArticleDto } from './interface/dto/create-article.dto';
 import type { IArticle } from './interface/article.interface';
 import { FindOneParams } from './interface/dto/find-one.params';
 import { UpdateArticleDto } from './interface/dto/update-article.dto';
+import { Article } from './entities/article.entity';
 
 @Controller('article')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
   @Get()
-  findAll(): IArticle[] {
-    return this.articleService.findAllArticle();
+  async findAll(): Promise<Article[]> {
+   return await this.articleService.findAllArticle();
   }
 
   @Get('/:id')
-  findOne(@Param() params: FindOneParams): IArticle {
-    return this.findOneOrFail(params.id);
+  async findOne(@Param() params: FindOneParams): Promise<Article> {
+    return await this.findOneOrFail(params.id);
   }
 
   @Post()
-  create(@Body() createArticleDto: CreateArticleDto): IArticle {
-    return this.articleService.createArticle(createArticleDto);
+  async create(@Body() createArticleDto: CreateArticleDto): Promise<Article> {
+    return await this.articleService.createArticle(createArticleDto);
   }
 
   @Put('/:id')
-  update(
+  async update(
     @Param() params: FindOneParams,
     @Body() updateArticleDto: UpdateArticleDto,
-  ): IArticle {
-    const article = this.findOneOrFail(params.id);
-    return this.articleService.updateArticleByParams(article, updateArticleDto);
+  ): Promise<Article> {
+    const article = await this.findOneOrFail(params.id);
+    return await this.articleService.updateArticleByParams(article, updateArticleDto);
   }
 
   @Delete('/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param() params: FindOneParams): void {
-    const article = this.findOneOrFail(params.id);
-    this.articleService.deleteByParams(article);
+  async remove(@Param() params: FindOneParams): Promise<void> {
+    const article = await this.findOneOrFail(params.id);
+    await this.articleService.deleteByParams(article);
   }
 
-  private findOneOrFail(id: string): IArticle {
-    const article = this.articleService.findOneByParams(id);
+   private async findOneOrFail(id: string): Promise<Article> {
+    const article = await this.articleService.findOneByParams(id);
     if (!article) {
       throw new NotFoundException();
     }
